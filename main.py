@@ -1,59 +1,102 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
-import uuid
+from fastapi import FastAPI
+from fastapi import Depends
+from fastapi import HTTPException
 
-from db import SessionLocal, engine, Base
-from models import User
-from schemas import UserCreate
+from sqlalchemy.orm import Session
+
+from database import engine
+from database import Base
+from database import get_db
+
+import models
+import schemas
+import crud
+
+# ---------------------------------------------------
+# CREATE TABLES
+# ---------------------------------------------------
+
+models.Base.metadata.create_all(
+    bind=engine
+)
+
+# ---------------------------------------------------
+# FASTAPI
+# ---------------------------------------------------
 
 app = FastAPI()
 
-# Create tables
-Base.metadata.create_all(bind=engine)
+# ---------------------------------------------------
+# ROOT
+# ---------------------------------------------------
 
-# DB dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+@app.get("/")
 
-# ---------------------------
-# ADD USER (CUSTOMER)
-# ---------------------------
-
-@app.post("/users")
-def add_user(user: UserCreate, db: Session = Depends(get_db)):
-
-    # check mobile exists
-    existing = db.query(User).filter(
-        User.mobile_number == user.mobile_number
-    ).first()
-
-    if existing:
-        raise HTTPException(
-            status_code=400,
-            detail="User already exists"
-        )
-
-    new_user = User(
-        id=str(uuid.uuid4()),
-        full_name_ar=user.full_name_ar,
-        full_name_en=user.full_name_en,
-        mobile_number=user.mobile_number,
-        national_id=user.national_id,
-        address=user.address,
-        city=user.city,
-        total_credit=user.total_credit,
-        balance_remaining=user.total_credit
-    )
-
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+def root():
 
     return {
-        "message": "User created successfully",
-        "user_id": new_user.id
+        "message": "Thiqa API Running"
     }
+
+# ---------------------------------------------------
+# ADD MERCHANT
+# ---------------------------------------------------
+
+@app.post("/merchants")
+
+def create_merchant(
+
+    merchant: schemas.MerchantCreate,
+
+    db: Session = Depends(get_db)
+):
+
+    return crud.create_merchant(
+        db,
+        merchant
+    )
+
+# ---------------------------------------------------
+# ADD USER
+# ---------------------------------------------------
+
+@app.post("/users")
+
+def create_user(
+
+    user: schemas.UserCreate,
+
+    db: Session = Depends(get_db)
+):
+
+    return crud.create_user(
+        db,
+        user
+    )
+
+# ---------------------------------------------------
+# ADD PAYMENT
+# ---------------------------------------------------
+
+@app.post("/payments")
+
+def add_payment(
+
+    payment: schemas.PaymentCreate,
+
+    db: Session = Depends(get_db)
+):
+
+    result = crud.add_payment(
+        db,
+        payment
+    )
+
+    if not result:
+
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    return result
