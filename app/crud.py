@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 
-from models import Merchant
-from models import User
-from models import Payment
+from app.models import Merchant
+from app.models import User
+from app.models import Payment
 
 # ---------------------------------------------------
 # CREATE MERCHANT
