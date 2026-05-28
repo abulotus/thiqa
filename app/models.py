@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 
 from datetime import datetime
 
-from app.database import Base
+from app.databas import Base
 
 # ---------------------------------------------------
 # MERCHANTS
