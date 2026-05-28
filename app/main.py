@@ -4,13 +4,13 @@ from fastapi import HTTPException
 
 from sqlalchemy.orm import Session
 
-from app.database import engine
-from app.database import Base
-from app.database import get_db
+from database import engine
+from database import Base
+from database import get_db
 
-import app.models as models
-import app.schemas as schemas
-import app.crud as crud
+import models as models
+import schemas as schemas
+import crud as crud
 
 # ---------------------------------------------------
 # CREATE TABLES
