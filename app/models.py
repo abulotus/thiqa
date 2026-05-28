@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 
 from datetime import datetime
 
-from app.databas import Base
+from app.database import Base
 
 # ---------------------------------------------------
 # MERCHANTS
@@ -20,7 +20,7 @@ class Merchant(Base):
 
     id = Column(Integer, primary_key=True)
 
-    business_name = Column(String)
+    business_name_ar = Column(String)
 
     owner_name = Column(String)
 
@@ -48,7 +48,7 @@ class User(Base):
         ForeignKey("merchants.id")
     )
 
-    full_name = Column(String)
+    full_name_ar = Column(String)
 
     mobile_number = Column(
         String,
